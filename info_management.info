@@ -1,0 +1,13 @@
+;  
+name = "Information Management"
+description = Collect and Manage Information.
+core = 7.x
+package = Information Management
+configure = admin/config/content/info_management
+
+; Files that contain classes:
+ 
+
+; Information added by drupal.org packaging script 
+ 
+
