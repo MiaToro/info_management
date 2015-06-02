@@ -1,0 +1,169 @@
+<?php
+
+/**
+ * @file
+ *   Information module install/schema hooks.
+ */
+
+/**
+ * Implements hook_schema().
+ */ 
+function info_management_schema() {
+  $schema = array();
+  
+  $schema['info_management_country'] = array(
+    'fields' => array(
+      'c_id' => array(
+        'description' => t('The primary identifier for a record.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+	  ),
+      'c_e_name' => array(
+        'description' => t('The name of the industry in English.'),
+        'type' => 'varchar',
+		'length' => 50,
+	  ),
+	  'c_c_name' => array(
+        'description' => t('The name of the industry in Chinese.'),
+        'type' => 'varchar',
+		'length' => 50,
+	  ),
+	),
+	'primary key' => array('c_id'),
+  );
+    
+  $schema['info_management_industry'] = array(
+    'fields' => array(
+      'i_id' => array(
+        'description' => t('The primary identifier for a record.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+	  ),
+      'i_e_name' => array(
+        'description' => t('The name of the industry in English.'),
+        'type' => 'varchar',
+		'length' => 50,
+	  ),
+	  'i_c_name' => array(
+        'description' => t('The name of the industry in Chinese.'),
+        'type' => 'varchar',
+		'length' => 50,
+	  ),
+	),
+	'primary key' => array('i_id'),
+  );
+  
+  $schema['info_management_source'] = array(
+    'fields' => array(
+      's_id' => array(
+        'description' => t('The primary identifier for a record.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+	  ),
+      's_e_name' => array(
+        'description' => t('Where the data comes from in English.'),
+        'type' => 'varchar',
+		'length' => 50,
+	  ),
+	  's_c_name' => array(
+        'description' => t('Where the data comes from in Chinese.'),
+        'type' => 'varchar',
+		'length' => 50,
+	  ),
+	),
+	'primary key' => array('s_id'),
+  );
+  
+  $schema['info_management'] = array(
+     // specification for 'info_management' table 
+	 'fields' => array(
+      'id' => array(
+        'description' => t('The primary identifier for a record.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+	  ),
+      'first_name' => array(
+        'description' => t('The first name of the contact.'),
+        'type' => 'varchar',
+		'length' => 50,
+	  ),
+      'last_name' => array(
+        'description' => t('The last name of the contact.'),
+        'type' => 'varchar',
+        'length' => 50,
+	  ),
+      'email' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 100,
+	  ),
+	  'col_country' => array(
+		'description' => t('The id_id of the \'country\' table.'),
+		'type' => 'int', 
+		'size' => 'tiny',
+		'unsigned' => TRUE, 
+		'default' => 1,   
+	  ),	
+	  'col_industry' => array(
+		'description' => t('The id_id of the \'industry\' table.'),
+		'type' => 'int', 
+		'size' => 'tiny',
+		'unsigned' => TRUE, 
+		'default' => 1,
+	  ),   
+	  'col_source' => array(
+		'description' => t('The id_id of the \'info_source\' table.'),
+		'type' => 'int', 
+		'size' => 'tiny',
+		'unsigned' => TRUE, 
+		'default' => 1,   
+	  ),
+	),
+	'indexes' => array(
+	  'id' => array('id'),
+	),
+	'foreign keys' => array(
+	  'col_country' => array(
+	    'table' => 'info_management_country',
+		'columns' => array('c_id' => 'col_country'),
+	  ),
+	  'col_country' => array(
+	    'table' => 'info_management_industry',
+	    'columns' => array('i_id' => 'col_industry'),
+	  ),
+      'col_source' => array(
+	    'table' => 'info_management_source',
+	    'columns' => array('s_id' => 'col_source'),
+	  ),
+	),
+    'primary key' => array('id'),
+  );
+  
+  return $schema;
+}
+ 
+/**
+ * Implements hook_install().
+ */ 
+function info_management_install() {
+  // Create tables.
+  drupal_install_schema('info_management');
+  drupal_install_schema('info_management_country');
+  drupal_install_schema('info_management_industry');
+  drupal_install_schema('info_management_source');
+}
+
+/**
+ * Implements hook_uninstall().
+ */ 
+function info_management_uninstall() {
+  // Drop tables.
+  drupal_uninstall_schema('info_management');
+  drupal_uninstall_schema('info_management_country');
+  drupal_uninstall_schema('info_management_industry');
+  drupal_uninstall_schema('info_management_source');
+}
