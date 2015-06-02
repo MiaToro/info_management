@@ -1,0 +1,244 @@
+<?php
+
+/**
+ * @file
+ * Implements the necessary hooks for the information manager to work properly.
+ */
+
+/**
+ * Implements hook_help().
+ *
+ * Displays help and module information.
+ *
+ * @param path
+ *   Which path of the site we're using to display help
+ * @param arg
+ *   Array that holds the current path as returned from arg() function
+ */
+function info_management_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#info_management":
+      return '<p>' . t('Collect and manage information such as contacts') . '</p>';
+      break;
+  }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function info_management_block_info() {
+  $blocks['info_management'] = array(
+    // The name that will appear in the block list.
+    'info' => t('Information Management'),
+    // Default setting.
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+  return $blocks;
+}
+
+function info_management_theme() {
+	$themes = array (
+	 'info_management_custompage_template' => array(
+		'template' => 'custompage', // your template file called custompage.tpl.php
+			'arguments' => array(),
+		),
+	);
+	return $themes;
+} 
+
+/**
+ * Implements hook_block_view().
+ *
+ * Prepares the contents of the block(s).   
+ */
+function info_management_block_view($delta = '') {
+  $block['content'] = theme('info_management_custompage_template', array('title' => 'Information Management', 'path' => 'info_management'));  
+  return $block;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function info_management_menu() {
+  $items = array();
+ 
+  $items['admin/config/content/sumofpage'] = array(
+    'title' => 'Information Management Configuration',
+    'description' => 'Configuration for Information Management module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_form'),
+    'access arguments' => array('access info_management content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // introducation
+  $items['info_management/data'] = array(
+    'title' => 'Information Management',
+    'page callback' => 'info_management_intro',
+    'access callback' => TRUE,
+    'expanded' => TRUE,
+  );    
+  $items['info_management/data/process'] = array(
+    'title' => 'Data Process',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_display_data'),
+    'access callback' => TRUE,
+    'description' => '',
+    'file' => 'process_data.inc',
+    'expanded' => TRUE,
+  );
+  $items['info_management/data/process/1'] = array(
+    'title' => 'Data Display',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_display_data'),
+    'access callback' => TRUE,
+    'description' => '',
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'process_data.inc',
+  );
+  $items['info_management/data/process/1/%'] = array(
+    'title' => 'Data Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_delete_one_link_confirm',4),
+    'access callback' => TRUE,
+    'description' => '',
+	'type' => MENU_CALLBACK,
+    'file' => 'process_data.inc',
+  );  
+  $items['info_management/data/process/2'] = array(
+    'title' => 'Data Input',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_input_data'),
+    'access callback' => TRUE,
+    'description' => '',
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'process_data.inc',
+  );
+  $items['info_management/data/process/3'] = array(
+    'title' => 'Data Update',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_mass_or_one_update'),
+    'access callback' => TRUE,
+    'description' => '',
+	'type' => MENU_LOCAL_TASK,
+    'file' => 'process_data.inc',
+	'weight' => 5,
+  );
+  $items['info_management/data/process/3/%'] = array(
+    'title' => 'Data Update',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_mass_or_one_update',4),
+    'access callback' => TRUE,
+    'description' => '',
+	'type' => MENU_LOCAL_TASK,
+    'file' => 'process_data.inc',
+	'weight' => 5,
+  );   
+  $items['info_management/data/process/industry'] = array(
+    'title' => 'Industry',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_industry_form',4),
+    'access callback' => TRUE,
+    'description' => '',
+	'type' => MENU_LOCAL_TASK,
+    'file' => 'industry_table.inc',
+	'weight' => 6,
+  );   
+  $items['info_management/data/process/industry/1/%'] = array(
+    'title' => 'Industry Delete',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('info_management_industry_delete_confirm', 5),
+	'access callback' => TRUE,
+	'description' => '',
+	'type' => MENU_CALLBACK,
+	'file' => 'industry_table.inc',
+	'weight' => 6,
+  );
+  $items['info_management/data/process/industry/2/%'] = array(
+    'title' => 'Industry Update',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('info_management_industry_update_form', 5),
+	'access callback' => TRUE,
+	'description' => '',
+ 	'type' => MENU_LOCAL_TASK,
+	'file' => 'industry_table.inc',
+	'weight' => 6,
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback for our general info page.
+ */
+function info_management_intro() {
+  $markup = t('The information module is to collect and manage the content of a table.');
+  return array('#markup' => $markup);
+}
+
+/**
+ * Implements hook_permission().
+ */
+function info_management_permission(){
+  return array(
+    'access info_management content' => array(
+      'title' => t('Access content for the Information Management module'),
+    )
+  );
+}
+
+/**
+ * Form function, called by drupal_get_form()
+ * in info_management_menu().
+ */
+function info_management_form($form, &$form_state) {
+  $form['info_management_max'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum of records'),
+    '#default_value' => variable_get('info_management_sum_of_page', 20),
+    '#size' => 3,
+    '#maxlength' => 3,
+    '#description' => t('The maximum of records to display in the page.'),
+    '#required' => TRUE,
+  );
+  //Takes care of providing submit button and user messages.
+  return system_settings_form($form);
+}
+
+/**
+ * Implements validation from the Form API.
+ *
+ * The function name is created in a similar way to a hook,
+ * by appending '_validate' to the name of the form, as defined by
+ * the function above and passed to drupal_get_form in info_management_menu().
+ *
+ * @param $form
+ *   A structured array containing the elements and properties of the form.
+ * @param $form_state
+ *   An array that stores information about the form's current state
+ *   during processing.
+ */
+function info_management_form_validate($form, &$form_state){
+  $max_num = $form_state['values']['info_management_max'];
+  if (!is_numeric($max_num)){
+    form_set_error('info_management_max', t('You must enter an integer for the maximum of records to display.'));
+  }
+  elseif ($max_num <= 0){
+    form_set_error('info_management_max', t('Maximum of records to display must be positive.'));
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function info_management_form_alter(&$form, &$form_state, $form_id) {
+  // if ($form_id == 'info_management_display_data') {  }
+//  drupal_set_message("Form ID is : " . $form_id);
+}
+
+/**
+ * Implements hook_init().
+ */
+function info_management_init() {
+  drupal_add_css(drupal_get_path('module', 'info_management') . '/css/info_management.css');
+}
