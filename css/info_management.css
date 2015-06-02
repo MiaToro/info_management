@@ -1,0 +1,148 @@
+@charset "utf-8";
+/* CSS Document */
+
+.info-management-reset,  
+.info-management-undo,
+.info-management-update,
+.info-management-update-delete {
+  margin-left: 20px;   
+}
+
+.info-management-submit,
+.info-management-undo,  
+.info-management-reset,
+.info-management-update,
+.info-management-reset-submit { 
+  width: 100px;  
+}
+
+.info-management-mass-update-submit,
+.info-management-mass-reset-submit,
+.info-management-reset-submit,
+.info-management-input-submit,
+.info-management-update-delete,
+.info-management-update-submit, 
+.info-management-industry-input-submit,
+.info-management-industry-update-submit,
+.info-management-industry-reset-submit { 
+  float:right; 
+  margin-right: 20px;
+}
+.info-management-column-id { 
+  min-width: 40px;;	
+}
+
+.info-management-column-first-name { 
+  min-width: 100px;  
+}
+
+.info-management-column-last-name { 
+  min-width: 100px;	
+}
+
+.info-management-column-email { 
+  min-width: 100px;	
+}
+
+.info-management-column-operation {  
+  min-width: 100px;
+}
+
+#info-management-display-data .form-checkbox {
+  width: 30px;
+}
+
+#info-management-display-data {
+  width: 100%;
+}
+ 
+#info-management-display-data table,
+#info-management-industry-form table {
+  border: #CCC thin solid; 
+}
+
+#info-management-display-data thead,
+#info-management-industry-form thead { 
+  background-color: #E8E8E8; 
+  border: #CCC thin solid; 
+}
+
+#info-management-display-data table .even,
+#info-management-industry-form table .even { 
+  background-color: #E8E8E8; 
+}
+
+#info-management-display-data table .odd, 
+#info-management-industry-form table .odd { 
+  background-color: #FFFFFF; 
+}
+ 
+#info-management-display-data table th,
+#info-management-display-data table td,
+#info-management-industry-form table th,
+#info-management-industry-form table td { 
+/*  white-space: nowrap;   */
+  padding-left: 10px;
+  border: #CCC thin solid; 
+} 
+
+#info-management-display-data table th .active { 
+  text-decoration: none;
+}
+
+#info-management-display-data table th a:hover { 
+  text-decoration: underline;
+}
+
+#info-management-display-data .fieldset-legend {
+  position: absolute;
+  text-transform: uppercase;
+  padding-top: 10px;
+}
+
+#info-management-display-data label,
+#edit-name label,
+#info-management-mass-update-form label,
+#info-management-industry-update-one-form label,
+#info-management-mass-or-one-update label {
+  display: inline; 
+  font-weight: normal;  
+}
+
+#info-management-display-data fieldset { 
+  border: #C0C0C0 thin solid;  
+  padding-top: 35px;   
+}
+ 
+#info-management-display-data #edit-options {
+  margin-top: 5px;   
+} 
+
+#info-management-display-data #edit-operation {
+  margin-top: 0px;
+}
+
+#info-management-display-data li a,
+#info-management-industry-form li a,
+#info-management-industry-update-form li a{ 
+  background: none; 
+  color: #06F;	 
+}
+#info-management-display-data li a:hover,
+#info-management-industry-form li a:hover,
+#info-management-industry-update-form li a:hover { 
+  background-color: #CCC;
+  color: #FFF; 
+}
+
+#info-management-update-data #edit-update {
+  padding-top: 0px;
+}
+
+#info-management-update-data label {
+  display: inline; 
+  font-weight: normal;  
+}
+#edit-cancel { 
+  margin-left:20px;
+}
