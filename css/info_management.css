@@ -24,7 +24,13 @@
 .info-management-update-submit, 
 .info-management-industry-input-submit,
 .info-management-industry-update-submit,
-.info-management-industry-reset-submit { 
+.info-management-industry-reset-submit,
+.info-management-country-input-submit,
+.info-management-country-update-submit,
+.info-management-country-reset-submit,
+.info-management-source-input-submit,
+.info-management-source-update-submit,
+.info-management-source-reset-submit { 
   float:right; 
   margin-right: 20px;
 }
@@ -57,36 +63,51 @@
 }
  
 #info-management-display-data table,
-#info-management-industry-form table {
+#info-management-industry-form table,
+#info-management-country-form table,
+#info-management-source-form table {
   border: #CCC thin solid; 
 }
 
 #info-management-display-data thead,
-#info-management-industry-form thead { 
+#info-management-industry-form thead,
+#info-management-country-form thead,
+#info-management-source-form thead { 
   background-color: #E8E8E8; 
   border: #CCC thin solid; 
 }
 
 #info-management-display-data table .even,
-#info-management-industry-form table .even { 
+#info-management-industry-form table .even,
+#info-management-country-form table .even,
+#info-management-source-form table .even { 
   background-color: #E8E8E8; 
 }
 
 #info-management-display-data table .odd, 
-#info-management-industry-form table .odd { 
+#info-management-industry-form table .odd,
+#info-management-country-form table .odd,
+#info-management-source-form table .odd { 
   background-color: #FFFFFF; 
 }
  
 #info-management-display-data table th,
 #info-management-display-data table td,
 #info-management-industry-form table th,
-#info-management-industry-form table td { 
+#info-management-industry-form table td,
+#info-management-country-form table th,
+#info-management-country-form table td,
+#info-management-source-form table th,
+#info-management-source-form table td { 
 /*  white-space: nowrap;   */
   padding-left: 10px;
   border: #CCC thin solid; 
 } 
 
-#info-management-display-data table th .active { 
+#info-management-display-data table th .active,
+#info-management-country-form table th .active,
+#info-management-industry-form table th .active,
+#info-management-source-form table th .active { 
   text-decoration: none;
 }
 
@@ -104,6 +125,8 @@
 #edit-name label,
 #info-management-mass-update-form label,
 #info-management-industry-update-one-form label,
+#info-management-country-update-one-form label,
+#info-management-source-update-one-form label,
 #info-management-mass-or-one-update label {
   display: inline; 
   font-weight: normal;  
@@ -112,6 +135,13 @@
 #info-management-display-data fieldset { 
   border: #C0C0C0 thin solid;  
   padding-top: 35px;   
+}
+#info-management-input-data fieldset,
+#info-management-mass-or-one-update fieldset,
+#info-management-country-form fieldset,
+#info-management-industry-form fieldset,
+#info-management-source-form fieldset { 
+  border: #C0C0C0 thin solid;   
 }
  
 #info-management-display-data #edit-options {
@@ -124,13 +154,21 @@
 
 #info-management-display-data li a,
 #info-management-industry-form li a,
-#info-management-industry-update-form li a{ 
+#info-management-industry-update-form li a,
+#info-management-country-form li a,
+#info-management-country-update-form li a,
+#info-management-source-form li a,
+#info-management-source-update-form li a { 
   background: none; 
   color: #06F;	 
 }
 #info-management-display-data li a:hover,
 #info-management-industry-form li a:hover,
-#info-management-industry-update-form li a:hover { 
+#info-management-industry-update-form li a:hover,
+#info-management-country-form li a:hover,
+#info-management-country-update-form li a:hover,
+#info-management-source-form li a:hover,
+#info-management-source-update-form li a:hover { 
   background-color: #CCC;
   color: #FFF; 
 }
