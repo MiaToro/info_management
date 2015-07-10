@@ -17,12 +17,6 @@ function info_management_industry_input_form($form, &$form_state) {
     '#title' => t('Data Input'),
 	'#attributes' => array('class' => array('container-inline')),
   ); 
-/*  $form['name']['id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('ID'),
-	'#size' => 20,
-    '#maxlength' => 20,
-  );  */
   $form['name']['i_e_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Name in English:'),
@@ -45,7 +39,6 @@ function info_management_industry_input_form($form, &$form_state) {
 	   'class' => array('info-management-industry-input-submit'),
 	  ),
   );
-
   return $form;
 }
 
@@ -67,13 +60,13 @@ function info_management_industry_input_form_submit($form, &$form_state) {
 		  '@c_name' => $form_state['values']['i_c_name'],
 		)
 	  ));  
-	}
+  }
   catch (Exception $e) {
 	  // Something went wrong somewhere, so roll back now.
 	  if ($id)
-		$i_txn->rollback();
+		$id->rollback();
 	  // Log the exception to watchdog.
-	  watchdog_exception('type', $e);
+	  watchdog_exception('info_management_industry_input', $e);
   }
 }
 
@@ -107,7 +100,7 @@ function info_management_industry_update_form($form, &$form_state, $arg0) {
   * Form builder: Builds the data management overview.
   */  
 function info_management_industry_data() {  
-  $user_access =  1; //user_access('Access content for the Information Management module');
+  $user_access =  1; // user_access('Access content for the Information Management module');
  	
   // Build the sortable table header  
   $header = array(
@@ -221,19 +214,27 @@ function info_management_industry_delete_confirm_submit($form, &$form_state, $ar
  * Delete record by id
  */
 function _record_delete_one($keys) {
+  // Transaction
+  $transaction = db_transaction();
   try { 
-   foreach ($keys as $id) { 
-	 $result = db_delete('info_management_industry')
-	   ->condition('i_id', $id, '=')
-	   ->execute();
-   }
+    db_query('LOCK TABLES {info_management_industry} WRITE, {info_management} WRITE;');
+    foreach ($keys as $id) { 
+	  $result = db_delete('info_management_industry')
+	    ->condition('c_id', $id, '=')
+	    ->execute();
+      $id_updated = db_update('info_management')  
+        ->fields(array('col_industry' => '1'))
+        ->condition('col_industry', $id, '=')
+        ->execute();
+    }
+	db_query('UNLOCK TABLES;');
   }
   catch (Exception $e) {
-    if ($result)
-	  $transaction->rollback();
-	watchdog_exception('node', $e);
+    $transaction->rollback();
+	watchdog_exception('_record_delete_one', $e);
 	throw $e;
   }
+  // End of Transaction
 }
  
 /**
@@ -251,10 +252,10 @@ function info_management_industry_update_one_form($form, $form_state, $arg0) {
   }
   catch (Exception $e) {
 	// Something went wrong somewhere, so roll back now.
-	if ($result)
-	  $txn->rollback();
+	if ($query)
+	  $query->rollback();
 	// Log the exception to watchdog.
-	watchdog_exception('type', $e);
+	watchdog_exception('info_management_industry_select', $e);
   }
   
   foreach ($result as $row){
@@ -302,7 +303,6 @@ function info_management_industry_update_one_form($form, $form_state, $arg0) {
 		),
 	);
   };
-
   return $form; 
 }
 
@@ -325,8 +325,8 @@ function info_management_industry_update_one_form_submit($form, &$form_state) {
   }
   catch (Exception $e) {
     // Something went wrong somewhere, so roll back now.
-    $txn->rollback();
+    if (id_updated) $id_updated->rollback();
     // Log the exception to watchdog.
-    watchdog_exception('type', $e);
+    watchdog_exception('info_management_industry_update', $e);
   }
 }
