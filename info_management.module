@@ -37,13 +37,13 @@ function info_management_block_info() {
 }
 
 function info_management_theme() {
-	$themes = array (
-	 'info_management_custompage_template' => array(
-		'template' => 'custompage', // your template file called custompage.tpl.php
-			'arguments' => array(),
-		),
-	);
-	return $themes;
+  $themes = array (
+   'info_management_custompage_template' => array(
+	  'template' => 'custompage', // your template file called custompage.tpl.php
+		  'arguments' => array(),
+	  ),
+  );
+  return $themes;
 } 
 
 /**
@@ -134,6 +134,36 @@ function info_management_menu() {
     'file' => 'process_data.inc',
 	'weight' => 5,
   );   
+    $items['info_management/data/process/country'] = array(
+    'title' => 'Country',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_country_form',4),
+    'access callback' => TRUE,
+    'description' => '',
+	'type' => MENU_LOCAL_TASK,
+    'file' => 'country_table.inc',
+	'weight' => 6,
+  );   
+  $items['info_management/data/process/country/1/%'] = array(
+    'title' => 'Country Delete',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('info_management_country_delete_confirm', 5),
+	'access callback' => TRUE,
+	'description' => '',
+	'type' => MENU_CALLBACK,
+	'file' => 'country_table.inc',
+	'weight' => 6,
+  );
+  $items['info_management/data/process/country/2/%'] = array(
+    'title' => 'Country Update',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('info_management_country_update_form', 5),
+	'access callback' => TRUE,
+	'description' => '',
+ 	'type' => MENU_LOCAL_TASK,
+	'file' => 'country_table.inc',
+	'weight' => 6,
+  );
   $items['info_management/data/process/industry'] = array(
     'title' => 'Industry',
     'page callback' => 'drupal_get_form',
@@ -142,7 +172,7 @@ function info_management_menu() {
     'description' => '',
 	'type' => MENU_LOCAL_TASK,
     'file' => 'industry_table.inc',
-	'weight' => 6,
+	'weight' => 7,
   );   
   $items['info_management/data/process/industry/1/%'] = array(
     'title' => 'Industry Delete',
@@ -152,7 +182,7 @@ function info_management_menu() {
 	'description' => '',
 	'type' => MENU_CALLBACK,
 	'file' => 'industry_table.inc',
-	'weight' => 6,
+	'weight' => 7,
   );
   $items['info_management/data/process/industry/2/%'] = array(
     'title' => 'Industry Update',
@@ -162,9 +192,38 @@ function info_management_menu() {
 	'description' => '',
  	'type' => MENU_LOCAL_TASK,
 	'file' => 'industry_table.inc',
-	'weight' => 6,
+	'weight' => 7,
   );
-
+  $items['info_management/data/process/source'] = array(
+    'title' => 'Source',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('info_management_source_form',4),
+    'access callback' => TRUE,
+    'description' => '',
+	'type' => MENU_LOCAL_TASK,
+    'file' => 'source_table.inc',
+	'weight' => 8,
+  );   
+  $items['info_management/data/process/source/1/%'] = array(
+    'title' => 'Source Delete',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('info_management_source_delete_confirm', 5),
+	'access callback' => TRUE,
+	'description' => '',
+	'type' => MENU_CALLBACK,
+	'file' => 'source_table.inc',
+	'weight' => 8,
+  );
+  $items['info_management/data/process/source/2/%'] = array(
+    'title' => 'Source Update',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('info_management_source_update_form', 5),
+	'access callback' => TRUE,
+	'description' => '',
+ 	'type' => MENU_LOCAL_TASK,
+	'file' => 'source_table.inc',
+	'weight' => 8,
+  );
   return $items;
 }
 
