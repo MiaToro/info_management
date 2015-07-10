@@ -17,3 +17,4 @@ Installation
 Developed by
 ===================
 Mia Jiao 
+Email: mia.q.jiao@gmail.com
