@@ -16,13 +16,12 @@ function info_management_input_data($form, &$form_state) {
     '#type' => 'item',
     '#title' => t('Data Input'),
 	'#title_display' => 'invisible',
-  );
-  
+  );  
   // This is the form elements.
   $form['name'] = array(
     '#type' => 'fieldset',
     //'#title' => t('Personal Information'),
-	 // Make the fieldset collapsible.
+	// Make the fieldset collapsible.
     //'#collapsible' => TRUE,
     //'#collapsed' => FALSE,
   ); 
@@ -50,6 +49,16 @@ function info_management_input_data($form, &$form_state) {
     '#title' => t('Industry:'),
 	'#options' => info_management_subtable('info_management_industry', 'i_id'),
   );  
+  $form['name']['col_country'] = array(
+    '#type' => 'select',
+    '#title' => t('Country:'),
+	'#options' => info_management_subtable('info_management_country', 'c_id'),
+  );
+  $form['name']['col_source'] = array(
+    '#type' => 'select',
+    '#title' => t('Source:'),
+	'#options' => info_management_subtable('info_management_source', 's_id'),
+  );  
   $form['actions']['reset'] = array( 
     '#markup' => '<input class="info-management-reset-submit form-submit" type="reset" value="' . t("Reset"). '"/>',  
   );  
@@ -69,13 +78,16 @@ function info_management_input_data($form, &$form_state) {
   * Submit handler for input_data().
   */
 function info_management_input_submit($form, &$form_state) {
+  $transaction = db_transaction();
   try {
 	$id = db_insert('info_management')
 	->fields(array(
 	  'first_name' => check_plain($form_state['values']['first_name']),
 	  'last_name' => check_plain($form_state['values']['last_name']),
 	  'email' => check_plain($form_state['values']['email']),
+	  'col_country' => check_plain($form_state['values']['col_country']),
 	  'col_industry' => check_plain($form_state['values']['col_industry']),
+	  'col_source' => check_plain($form_state['values']['col_source']),
 	))
 	->execute();
 	
@@ -90,9 +102,9 @@ function info_management_input_submit($form, &$form_state) {
   }
   catch (Exception $e) {
 	// Something went wrong somewhere, so roll back now.
-	$txn->rollback();
+	$transaction->rollback();
 	// Log the exception to watchdog.
-	watchdog_exception('type', $e);
+	watchdog_exception('info_management_input', $e);
   }
 }
 
@@ -158,12 +170,30 @@ function info_management_filter_form() {
     '#maxlength' => 60,
   );
   
+  $form['filter']['col_country'] = array(
+    '#type' => 'select',
+    '#title' => t('Country:'),
+  );
+  $form['filter']['col_country']['#options']['0'] = "---------"; 
+  $form['filter']['col_country']['#options'] += info_management_subtable('info_management_country', 'c_id');
+  $form['filter']['col_country']['#default_value'] = 0; 
+  
   $form['filter']['col_industry'] = array(
     '#type' => 'select',
     '#title' => t('Industry:'),
-	'#options' => info_management_subtable('info_management_industry', 'i_id'),
-	'#default_value' => 1,
+/*	'#options' => info_management_subtable('info_management_industry', 'i_id'), */
   );
+  $form['filter']['col_industry']['#options']['0'] = "---------"; 
+  $form['filter']['col_industry']['#options'] += info_management_subtable('info_management_industry', 'i_id');
+  $form['filter']['col_industry']['#default_value'] = 0; 
+  
+  $form['filter']['col_source'] = array(
+    '#type' => 'select',
+    '#title' => t('Source:'),
+  );
+  $form['filter']['col_source']['#options']['0'] = "---------"; 
+  $form['filter']['col_source']['#options'] += info_management_subtable('info_management_source', 's_id');
+  $form['filter']['col_source']['#default_value'] = 0; 
   
   $form['filter']['actions']['submit'] = array(
 	'#type' => 'submit',
@@ -203,11 +233,9 @@ function info_management_filter_submit($form, &$form_state) {
 	  $filters = info_management_filters();
 	  $filters_key = array_keys($filters);
 	  foreach ($filters_key as $key) {
-			// drupal_set_message($key . '!=>' . $form_state['values'][$key]);
-		  if (trim($form_state['values'][$key]) != null) {
-			$_SESSION['record_overview_filter'][$key] = $form_state['values'][$key];
-			// drupal_set_message($key . '=>' . $form_state['values'][$key]);  
-		  }  
+		if (trim($form_state['values'][$key]) != null) {
+		  $_SESSION['record_overview_filter'][$key] = $form_state['values'][$key];
+		}  
 	  }
 	  drupal_set_message(t('Filter/Refine is submitted.')); 
 	  break;
@@ -223,10 +251,10 @@ function info_management_filter_submit($form, &$form_state) {
 }    
  
 /**
-  * Form builder: Builds the data management overview.
-  */  
+ * Form builder: Builds the data management overview.
+ */  
 function info_management_data() {  
-  $user_access =  1; //user_access('Access content for the Information Management module');
+  $user_access =  1; // user_access('Access content for the Information Management module');
   
   // Build the 'Update options' form.
   $form['options'] = array(
@@ -261,7 +289,9 @@ function info_management_data() {
 	'first_name' => array('data' => 'First Name', 'field' => 'n.first_name'),
 	'last_name' => array('data' => 'Last Name', 'field' => 'n.last_name'),
 	'email' => array('data' => t('Email'), 'field' => 'n.email'), 
-	'col_industry' => array('data' => t('Industry'), 'field' => 'n.col_industry'), 
+	'col_country' => array('data' => t('Country'), 'field' => 'n.col_country'), 
+	'col_industry' => array('data' => t('Industry'), 'field' => 'n.col_industry'),
+	'col_source' => array('data' => t('Source'), 'field' => 'n.col_source'),
 	'operation' =>  t('Operation'), 
   );
   
@@ -269,11 +299,15 @@ function info_management_data() {
   $max_num = variable_get('info_management_max', 3);
   $query = db_select('info_management', 'n')->extend('PagerDefault')->extend('TableSort');
   _record_build_filter_query($query);
+  $query->leftJoin('info_management_country', 'coun', 'n.col_country = coun.c_id');
   $query->leftJoin('info_management_industry', 'indu', 'n.col_industry = indu.i_id');
+  $query->leftJoin('info_management_source', 'sour', 'n.col_source = sour.s_id');  
 
   $results = $query
      ->fields('n', array('id', 'first_name', 'last_name', 'email'))
+	 ->fields('coun', array('c_id', 'c_c_name', 'c_e_name'))
 	 ->fields('indu', array('i_id', 'i_c_name', 'i_e_name'))
+	 ->fields('sour', array('s_id', 's_c_name', 's_e_name'))
      ->limit($max_num)
 	 ->orderByHeader($header)
      ->addTag('info_management access')
@@ -288,8 +322,9 @@ function info_management_data() {
 	$rows[$row->id]['first_name'] = array('data' => $row->first_name, 'class' => array('info-management-column-first-name'));
 	$rows[$row->id]['last_name'] = array('data' => $row->last_name, 'class' => array('info-management-column-last-name'));
 	$rows[$row->id]['email'] = array('data' => $row->email, 'class' => array('info-management-column-email')); 
+	$rows[$row->id]['col_country'] = array('data' => $row->c_e_name . '/' . $row->c_c_name, 'class' => array('info-management-column-country')); 
 	$rows[$row->id]['col_industry'] = array('data' => $row->i_e_name . '/' . $row->i_c_name, 'class' => array('info-management-column-industry')); 
-	
+	$rows[$row->id]['col_source'] = array('data' => $row->s_e_name . '/' . $row->s_c_name, 'class' => array('info-management-column-source')); 
 	// Build a list for all the accessible options for the current node
 	$operations = array();
   	if ($user_access) {
@@ -374,11 +409,18 @@ function info_management_filters() {
 	'#size' => 100,
 	'#maxlength' => 100,
   );  
+  $filters['col_country'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Country'),
+  );
   $filters['col_industry'] = array(
 	'#type' => 'textfield',
 	'#title' => t('Industry'),
   );      
-  
+  $filters['col_source'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Source'),
+  );
   return $filters;    
 }
 
@@ -389,15 +431,29 @@ function info_management_filters() {
  *   A SelectQuery to which the filters should be applied.
  */
 function _record_build_filter_query(SelectQueryInterface $query) {
-    // Build query
+  // Build query
   $filter_data = isset($_SESSION['record_overview_filter']) ? $_SESSION['record_overview_filter'] : array();
   foreach ($filter_data as $filter_key => $filter_value) {
     if (trim($filter_value) != null) {
-      $query->condition($filter_key, '%' . db_like($filter_value) . '%', 'LIKE');
+	  switch ($filter_key) {
+		case 'col_country':
+		  if ($filter_value !='0') 
+		    $query->condition($filter_key, $filter_value, '=');
+		  break;
+		case 'col_industry':
+		  if ($filter_value !='0') 
+		    $query->condition($filter_key, $filter_value, '=');
+		  break;
+		case 'col_source':	
+		  if ($filter_value !='0') 
+		    $query->condition($filter_key, $filter_value, '=');	
+		  break;
+		default: 
+		  $query->condition($filter_key, '%' . db_like($filter_value) . '%', 'LIKE');
+	  }      
   	} 
   }
 }
-
 
 /**
  * Validate info_management_records form submissions.
@@ -424,27 +480,16 @@ function info_management_records_submit($form, &$form_state) {
   $records = array_filter($form_state['values']['records']);
   
   if ($function = $operation['callback']) {
-    // Add in callback arguments if present
-/*  if (isset($operation['callback arguments'])) {
-	  $args = array_merge(array($records), $operation['callback arguments']);      
-    }
-    else {
-      $args = array($records);
-    }   */
-  //  call_user_func_array($function, array($form, $form_state, $args));
 	if ($function == 'info_management_mass_update') {
 	  $_SESSION['record_mass_update'] = $records;
-	  // call_user_func_array($function, array($form, $form_state, $args));
 	  $form_state['redirect'] = 'info_management/data/process/3/ids';
 	}
-	// cache_clear_all();
   }
   else {   
     // We need to rebuild the form to go to a second step. For example, to
     // show the confirmation form for the deletion of nodes.
     $form_state['rebuild'] = TRUE;
   }
-//  drupal_set_message(t('update is submitted.'));
 } 
 
 function info_management_operations() {
@@ -562,14 +607,14 @@ function info_management_delete_confirm_submit($form, &$form_state) {
 function _record_delete_multiple($keys) {
   try { 
    foreach ($keys as $id) { 
-	 db_delete('info_management')
+	 $result = db_delete('info_management')
 	   ->condition('id', $id, '=')
 	   ->execute();
    }
   }
   catch (Exception $e) {
-	$transaction->rollback();
-	watchdog_exception('node', $e);
+	if ($result) $result->rollback();
+	watchdog_exception('_record_delete_multiple', $e);
 	throw $e;
   }
 }
@@ -578,22 +623,15 @@ function _record_delete_multiple($keys) {
  *  Mass update or just update one 
  */
 function info_management_mass_or_one_update($form, &$form_state, $arg0) {
-
-  drupal_set_message('mass or one update3');
-//  var_dump($form_state);
-//  var_dump($form);
   if ($arg0 == 'ids') {
     $form['update'] = info_management_mass_update_form($form, $form_state, $arg0);
-//    $form['#submit'][] = 'info_management_mass_update_form_submit';
   }
   elseif ($arg0 != null) {
     $form['update'] = info_management_update_one_form($form, $form_state, $arg0);
-//    $form['#submit'][] = 'info_management_update_one_form_submit';     
   }
   else { 
     $_SESSION['record_mass_update'] = array(); 
     $form['update'] = info_management_mass_update_form($form, $form_state, $arg0);
-//    $form['#submit'][] = 'info_management_update_one_form_submit';     
   }  
   return $form;  
 }
@@ -607,7 +645,7 @@ function info_management_update_one_form($form, &$form_state, $arg0) {
 	
 	//Use Database API to retrieve records.
 	$query = db_select('info_management', 'n')
-	 ->fields('n', array('id', 'first_name', 'last_name', 'email', 'col_industry'))
+	 ->fields('n', array('id', 'first_name', 'last_name', 'email', 'col_country', 'col_industry', 'col_source'))
 	 ->condition('id', $arg0, '=')
 	 ->orderBy('id', 'DESC'); //Most recent first.
 		 
@@ -615,9 +653,9 @@ function info_management_update_one_form($form, &$form_state, $arg0) {
   }
   catch (Exception $e) {
 	// Something went wrong somewhere, so roll back now.
-	$txn->rollback();
+	if ($query) $query->rollback();
 	// Log the exception to watchdog.
-	watchdog_exception('type', $e);
+	watchdog_exception('info_management_update_one_form', $e);
   }
   
   foreach ($result as $row){
@@ -659,12 +697,24 @@ function info_management_update_one_form($form, &$form_state, $arg0) {
 	  '#size' => 50,
 	  '#maxlength' => 100,
 	  '#default_value' => $row->email,
+	);
+	$form['update']['col_country'] = array(
+	  '#type' => 'select',
+	  '#title' => 'Country: ',
+	  '#options' => info_management_subtable('info_management_country', 'c_id'),
+	  '#default_value' => $row->col_country,
 	);	
 	$form['update']['col_industry'] = array(
 	  '#type' => 'select',
 	  '#title' => 'Industry: ',
 	  '#options' => info_management_subtable('info_management_industry', 'i_id'),
 	  '#default_value' => $row->col_industry,
+	);
+	$form['update']['col_source'] = array(
+	  '#type' => 'select',
+	  '#title' => 'Source: ',
+	  '#options' => info_management_subtable('info_management_source', 's_id'),
+	  '#default_value' => $row->col_source,
 	);
     $form['update']['actions']['submit'] = array(
 	  '#type' => 'submit',
@@ -683,7 +733,6 @@ function info_management_update_one_form($form, &$form_state, $arg0) {
 	  ),
 	);
   };
-
   return $form; 
 }
 
@@ -699,7 +748,9 @@ function info_management_update_one_form_submit($form, &$form_state) {
 	  'first_name' => $form_state['values']['first_name'],
 	  'last_name' => $form_state['values']['last_name'],
 	  'email' => $form_state['values']['email'],
+	  'col_country' => $form_state['values']['col_country'],
 	  'col_industry' => $form_state['values']['col_industry'],
+	  'col_source' => $form_state['values']['col_source'],
 	))
 	 ->condition('id', $id, '=')
 	 ->execute();
@@ -709,9 +760,9 @@ function info_management_update_one_form_submit($form, &$form_state) {
   catch (Exception $e) {
 	// Something went wrong somewhere, so roll back now.
 	if ($id_updated)  
-	  $txn->rollback();
+	  $id_updated->rollback();
 	// Log the exception to watchdog.
-	watchdog_exception('type', $e);
+	watchdog_exception('info_management_update_one', $e);
   }
 }
 
@@ -719,15 +770,13 @@ function info_management_update_one_form_submit($form, &$form_state) {
  * Make mass update form.
  */
 function info_management_mass_update_form($form, &$form_state, $arg0) {
-  // Initial $_SESSION['record_mass_update']  to null 
-//  if ($arg0 == 'empty') {
-  //  $_SESSION['record_mass_update'] = array();
-//  }
   // The record ids checked in display window for "mass update" option
   $session = isset($_SESSION['record_mass_update']) ? $_SESSION['record_mass_update'] : array();
   
   $session_temp = implode(',', $session);
+  $options_country = info_management_country_table_id_to_name('info_management_country');
   $options_industry = info_management_industry_table_id_to_name('info_management_industry');
+  $options_source = info_management_source_table_id_to_name('info_management_source');
     
   $form['description'] = array(
     '#type' => 'item',
@@ -749,14 +798,12 @@ function info_management_mass_update_form($form, &$form_state, $arg0) {
   $form['mass_update']['field_name'] = array(
     '#type' => 'select',
     '#title' => t('Which field to update?'),
-  );  
-  
+  );    
   $filters = info_management_filters();
   foreach ($filters as $key => $value) {
     if($key != 'id') 
 	  $form['mass_update']['field_name']['#options'][$key]  = $value['#title'];
-  }	  
-  	  
+  }	    	  
   $form['mass_update']['old_value'] = array(
     '#type' => 'textfield',
     '#title' => t('Old Value:'),
@@ -772,28 +819,6 @@ function info_management_mass_update_form($form, &$form_state, $arg0) {
 	  ),
 	), 
   );  
-  $form['mass_update']['old_industry_value'] = array(
-    '#type' => 'select',
-    '#title' => t('Old Value:'),
-	'#options' => $options_industry,
-//	'#default_value' => 1,
-	'#states' => array(
-	  'visible' => array(
-		':input[name="field_name"]' => array('value' => 'col_industry')
-	  ),
-	 ),
-  );  
-  
-  $form['mass_update']['new_industry_value'] = array(
-    '#type' => 'select',
-    '#title' => t('New Value:'),
-	'#options' => $options_industry,
-	'#states' => array(
-	  'visible' => array(
-		':input[name="field_name"]' => array('value' => 'col_industry')
-	  ),
-	 ),
-  ); 
   $form['mass_update']['new_value'] = array(
     '#type' => 'textfield',
     '#title' => t('New Value:'),
@@ -809,10 +834,73 @@ function info_management_mass_update_form($form, &$form_state, $arg0) {
 	  ),
 	), 
   );
+  $form['mass_update']['old_country_value'] = array(
+    '#type' => 'select',
+    '#title' => t('Old Value:'),
+	'#options' => $options_country,
+//	'#default_value' => 1,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array('value' => 'col_country')
+	  ),
+	 ),
+  );  
+  $form['mass_update']['new_country_value'] = array(
+    '#type' => 'select',
+    '#title' => t('New Value:'),
+	'#options' => $options_country,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array('value' => 'col_country')
+	  ),
+	 ),
+  ); 
+  $form['mass_update']['old_industry_value'] = array(
+    '#type' => 'select',
+    '#title' => t('Old Value:'),
+	'#options' => $options_industry,
+//	'#default_value' => 1,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array('value' => 'col_industry')
+	  ),
+	 ),
+  );  
+  $form['mass_update']['new_industry_value'] = array(
+    '#type' => 'select',
+    '#title' => t('New Value:'),
+	'#options' => $options_industry,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array('value' => 'col_industry')
+	  ),
+	 ),
+  ); 
+  $form['mass_update']['old_source_value'] = array(
+    '#type' => 'select',
+    '#title' => t('Old Value:'),
+	'#options' => $options_source,
+//	'#default_value' => 1,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array('value' => 'col_source')
+	  ),
+	 ),
+  );  
+  $form['mass_update']['new_source_value'] = array(
+    '#type' => 'select',
+    '#title' => t('New Value:'),
+	'#options' => $options_source,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array('value' => 'col_source')
+	  ),
+	 ),
+  ); 
   $form['actions']['reset'] = array( 
     '#markup' => '<input class="info-management-mass-reset-submit form-submit" type="reset" value="' . t("Reset"). '"/>',  
   );
-  $form['action']['update'] = array(
+  $form['actions']['update'] = array(
     '#type' => 'submit',
     '#value' => t('Update'),
 	'#submit' => array('info_management_mass_update_form_submit'),
@@ -830,18 +918,26 @@ function info_management_mass_update_form($form, &$form_state, $arg0) {
  * Update the selected records.
  */   
 function info_management_mass_update_form_submit($form, &$form_state) { 
-  drupal_set_message('helper');
   // The record ids checked in display window for "mass update" option
   $session = isset($_SESSION['record_mass_update']) ? $_SESSION['record_mass_update'] : array();
   $field_name = $form_state['values']['field_name'];
-
-  if ($field_name == 'col_industry') {
-	$new_value = trim($form_state['values']['new_industry_value']);
-	$old_value = trim($form_state['values']['old_industry_value']);
-  } 
-  else {
-	$new_value = trim($form_state['values']['new_value']);
-	$old_value = trim($form_state['values']['old_value']);
+  
+  switch ($field_name) {
+    case 'col_country': 
+	  $new_value = trim($form_state['values']['new_country_value']);
+	  $old_value = trim($form_state['values']['old_country_value']);	
+	  break;
+	case 'col_industry':
+	  $new_value = trim($form_state['values']['new_industry_value']);
+	  $old_value = trim($form_state['values']['old_industry_value']);	
+	  break;
+	case 'col_source':
+	  $new_value = trim($form_state['values']['new_source_value']);
+	  $old_value = trim($form_state['values']['old_source_value']);	
+	  break;
+	default:
+	  $new_value = trim($form_state['values']['new_value']);
+	  $old_value = trim($form_state['values']['old_value']);	  
   }
   if (empty($session)) {
 	$query = db_select('info_management', 'n')
@@ -923,7 +1019,6 @@ function _data_mass_update_process($field_name, $new_value, $old_value, $id_arra
  * Data Mass Update - helper function
  */
 function _data_mass_update_helper($field_name, $new_value, $old_value, $id) {
-  drupal_set_message($field_name . $new_value . $old_value . $id . 'helper');
   try { 
     $id_updated = db_update('info_management');	
 	$id_updated->condition($field_name, $old_value, '=');
@@ -937,9 +1032,9 @@ function _data_mass_update_helper($field_name, $new_value, $old_value, $id) {
   catch (Exception $e) {
 	// Something went wrong somewhere, so roll back now.
 	if ($id_updated)
-	  $txn->rollback();
+	  $id_updated->rollback();
 	// Log the exception to watchdog.
-	watchdog_exception('type', $e);
+	watchdog_exception('_data_mass_update_helper', $e);
   }
 }
 
@@ -960,6 +1055,9 @@ function _data_mass_update_batch_finished($success, $results, $operations) {
 }
 
 function info_management_subtable($arg0, $arg1) {
+  $id = $arg0[16] . '_id';
+  $field_e = $arg0[16] . '_e_name';
+  $field_c = $arg0[16] . '_c_name';
   $options = array();
   try {
     $results = db_select($arg0, 'n')
@@ -967,19 +1065,48 @@ function info_management_subtable($arg0, $arg1) {
 	  ->orderBy($arg1, 'DESC')
 	  ->execute();
     foreach ($results as $row) {
- 	  $options[$row->i_id] = $row->i_e_name . '/' . $row->i_c_name;
+ 	  $options[$row->$id] = $row->$field_e . '/' . $row->$field_c;
  	}	   	
   }
   catch (Exception $e) {
 	// Something went wrong somewhere, so roll back now.
 	if ($results)
-	  $txn->rollback();
+	  $results->rollback();
 	// Log the exception to watchdog.
-	watchdog_exception('type', $e);    
+	watchdog_exception('info_management_subtable', $e);    
   }
   return $options;
 }
 
+/**
+ * Get the countries' names in English and Chinese from the "info_management_country" table
+ */ 
+function info_management_country_table_id_to_name($table, $arg0 = null) {
+  $options = array();
+  try {
+    $query = db_select($table, 'n')
+	  ->fields('n', array('c_id', 'c_c_name', 'c_e_name'));
+	if ($arg0 != null) 
+	  $query->condition('c_id', $arg0, '=');
+	
+	$results = $query->execute();
+    foreach ($results as $row) {
+ 	  $options[$row->c_id] = $row->c_c_name . '/' . $row->c_e_name;
+ 	}	   	
+  }
+  catch (Exception $e) {
+	// Something went wrong somewhere, so roll back now.
+	if ($results)
+	  $results->rollback();
+	// Log the exception to watchdog.
+	watchdog_exception('info_management_country_table_id_to_name', $e);    
+  }
+  return $options;
+}
+
+/**
+ * Get the industries' names in English and Chinese from the "info_management_industry" table
+ */ 
 function info_management_industry_table_id_to_name($table, $arg0 = null) {
   $options = array();
   try {
@@ -996,31 +1123,35 @@ function info_management_industry_table_id_to_name($table, $arg0 = null) {
   catch (Exception $e) {
 	// Something went wrong somewhere, so roll back now.
 	if ($results)
-	  $txn->rollback();
+	  $results->rollback();
 	// Log the exception to watchdog.
-	watchdog_exception('type', $e);    
+	watchdog_exception('info_management_industry_table_id_to_name', $e);    
   }
   return $options;
 }
 
-function info_management_country_table_id_to_name($arg0) {
+/**
+ * Get the sources' names in English and Chinese from the "info_management_source" table
+ */ 
+function info_management_source_table_id_to_name($table, $arg0 = null) {
   $options = array();
   try {
-    $results = db_select($arg0, 'n')
-	  ->fields('n')
-	  ->condition('i_id', $arg0, '=')
-	  ->execute()
-	  ->fetchAll();
+    $query = db_select($table, 'n')
+	  ->fields('n', array('s_id', 's_c_name', 's_e_name'));
+	if ($arg0 != null) 
+	  $query->condition('s_id', $arg0, '=');
+	
+	$results = $query->execute();
     foreach ($results as $row) {
- 	  $options[$row->i_id] = $row->i_c_name . '/' . $row->i_e_name;
+ 	  $options[$row->s_id] = $row->s_c_name . '/' . $row->s_e_name;
  	}	   	
   }
   catch (Exception $e) {
 	// Something went wrong somewhere, so roll back now.
 	if ($results)
-	  $txn->rollback();
+	  $results->rollback();
 	// Log the exception to watchdog.
-	watchdog_exception('type', $e);    
+	watchdog_exception('info_management_source_table_id_to_name', $e);    
   }
   return $options;
 }
