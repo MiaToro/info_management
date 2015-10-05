@@ -1,60 +1,139 @@
 <?php
 
 /**
-  * @file
-  * functions for info_management module
-  */ 
+ * @file
+ * functions for info_management module
+ */ 
   
 /**
-  * Generate the info_management add form array 
-  * 
-  * @see info_management_display_data()
-  */
+ * Generate the info_management add form array 
+ * 
+ * @see info_management_display_data()
+ */
 function info_management_input_data($form, &$form_state) {
-  
   $form['description'] = array(
     '#type' => 'item',
     '#title' => t('Data Input'),
 	'#title_display' => 'invisible',
   );  
   // This is the form elements.
-  $form['name'] = array(
+  $form['contact'] = array(
     '#type' => 'fieldset',
     //'#title' => t('Personal Information'),
 	// Make the fieldset collapsible.
     //'#collapsible' => TRUE,
     //'#collapsed' => FALSE,
   ); 
-  $form['name']['first_name'] = array(
+  $form['contact']['first_name'] = array(
     '#type' => 'textfield',
     '#title' => t('First Name in English:'),
-	'#size' => 60,
-    '#maxlength' => 60,
+	'#size' => 50,
+    '#maxlength' => 50,
   );
-  $form['name']['last_name'] = array(
+  $form['contact']['last_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Last Name in English:'),
-	'#size' => 60,
-    '#maxlength' => 60,
+	'#size' => 50,
+    '#maxlength' => 50,
+  );  
+  $form['contact']['chinese_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Chinese name:'),
+	'#size' => 50,
+    '#maxlength' => 50,
   );
-  $form['name']['email'] = array(
+  $form['contact']['company'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Company:'),
+	'#size' => 100,
+    '#maxlength' => 200,
+  );
+  $form['contact']['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title:'),
+	'#size' => 100,
+    '#maxlength' => 200,
+  );
+  $form['contact']['website'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Website:'),
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
+  $form['contact']['email'] = array(
     '#type' => 'textfield',
     '#title' => t('Email:'),
-	'#size' => 60,
-    '#maxlength' => 60,
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
+  $form['contact']['address'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Address:'),
+	'#size' => 100,
+    '#maxlength' => 200,
+  ); 
+  
+  $form['contact']['city'] = array(
+    '#type' => 'textfield',
+    '#title' => t('City:'),
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
+  $form['contact']['province'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Province:'),
+	'#size' => 50,
+    '#maxlength' => 100,
+  ); 
+  $form['contact']['postcode'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Postcode:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  ); 
+  
+  $form['contact']['mobile'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mobile:'),
+	'#size' => 20,
+    '#maxlength' => 20,
   );  
-
-  $form['name']['col_industry'] = array(
+  $form['contact']['tel_work'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Tel in office:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $form['contact']['tel_home'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Tel at home:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $form['contact']['fax'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Fax:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $form['contact']['note'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Note:'),
+	'#description' => t('No more than 1000 words please!'),
+	'#cols' => 50,
+  );     
+  
+  $form['contact']['col_industry'] = array(
     '#type' => 'select',
     '#title' => t('Industry:'),
 	'#options' => info_management_subtable('info_management_industry', 'i_id'),
   );  
-  $form['name']['col_country'] = array(
+  $form['contact']['col_country'] = array(
     '#type' => 'select',
     '#title' => t('Country:'),
 	'#options' => info_management_subtable('info_management_country', 'c_id'),
   );
-  $form['name']['col_source'] = array(
+  $form['contact']['col_source'] = array(
     '#type' => 'select',
     '#title' => t('Source:'),
 	'#options' => info_management_subtable('info_management_source', 's_id'),
@@ -75,8 +154,8 @@ function info_management_input_data($form, &$form_state) {
 }
  
 /**
-  * Submit handler for input_data().
-  */
+ * Submit handler for input_data().
+ */
 function info_management_input_submit($form, &$form_state) {
   $transaction = db_transaction();
   try {
@@ -84,10 +163,23 @@ function info_management_input_submit($form, &$form_state) {
 	->fields(array(
 	  'first_name' => check_plain($form_state['values']['first_name']),
 	  'last_name' => check_plain($form_state['values']['last_name']),
+      'chinese_name' => check_plain($form_state['values']['chinese_name']),
+      'company' => check_plain($form_state['values']['company']),
+      'title' => check_plain($form_state['values']['title']),
+      'website' => check_plain($form_state['values']['website']),
 	  'email' => check_plain($form_state['values']['email']),
+      'address' => check_plain($form_state['values']['address']),
+      'city' => check_plain($form_state['values']['city']),
+	  'province' => check_plain($form_state['values']['province']),
+      'postcode' => check_plain($form_state['values']['postcode']),
+      'mobile' => check_plain($form_state['values']['mobile']),
+	  'tel_work' => check_plain($form_state['values']['tel_work']),
+      'tel_home' => check_plain($form_state['values']['tel_home']),
+	  'fax' => check_plain($form_state['values']['fax']),
 	  'col_country' => check_plain($form_state['values']['col_country']),
 	  'col_industry' => check_plain($form_state['values']['col_industry']),
 	  'col_source' => check_plain($form_state['values']['col_source']),
+      'note' => check_plain($form_state['values']['note']),
 	))
 	->execute();
 	
@@ -109,8 +201,8 @@ function info_management_input_submit($form, &$form_state) {
 }
 
 /**
-  * Menu callback: content management.
-  */
+ * Menu callback: content management.
+ */
 function info_management_display_data($form, $form_state) {
   if (isset($form_state['values']['operation']) && $form_state['values']['operation'] == 'delete') {
     drupal_set_message(count($form_state['values']['records']));
@@ -139,7 +231,7 @@ function info_management_filter_form() {
     '#collapsible' => TRUE,
     '#collapsed' => FALSE, */
   ); 
-  //    '#markup' => t('SHOW ONLY ITEMS WHERE'),
+  // '#markup' => t('SHOW ONLY ITEMS WHERE'),
   
   $i = 0;
   foreach ($session as $key => $filter) {
@@ -151,24 +243,109 @@ function info_management_filter_form() {
 	  $form['filter']['current'][] = array('#markup' => t('where %property includes %value', $t_args));  
 	}  
   }
+  $form['filter']['id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('ID:'),
+	'#size' => 10,
+    '#maxlength' => 10,
+  );
   $form['filter']['first_name'] = array(
     '#type' => 'textfield',
     '#title' => t('First Name in English:'),
-	'#size' => 60,
-    '#maxlength' => 60,
+	'#size' => 50,
+    '#maxlength' => 50,
   );
   $form['filter']['last_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Last Name in English:'),
-	'#size' => 60,
-    '#maxlength' => 60,
+	'#size' => 50,
+    '#maxlength' => 50,
+  );  
+  $form['filter']['chinese_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Chinese name:'),
+	'#size' => 50,
+    '#maxlength' => 50,
   );
+  $form['filter']['company'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Company:'),
+	'#size' => 100,
+    '#maxlength' => 200,
+  );
+  $form['filter']['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title:'),
+	'#size' => 100,
+    '#maxlength' => 200,
+  );
+  $form['filter']['website'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Website:'),
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
   $form['filter']['email'] = array(
     '#type' => 'textfield',
     '#title' => t('Email:'),
-	'#size' => 60,
-    '#maxlength' => 60,
-  );
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
+  $form['filter']['address'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Address:'),
+	'#size' => 100,
+    '#maxlength' => 200,
+  ); 
+  
+  $form['filter']['city'] = array(
+    '#type' => 'textfield',
+    '#title' => t('City:'),
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
+  $form['filter']['province'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Province:'),
+	'#size' => 50,
+    '#maxlength' => 100,
+  ); 
+  $form['filter']['postcode'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Postcode:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  ); 
+  
+  $form['filter']['mobile'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mobile:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $form['filter']['tel_work'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Tel in office:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $form['filter']['tel_home'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Tel at home:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $form['filter']['fax'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Fax:'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $form['filter']['note'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Note:'),
+	'#cols' => 50,
+  ); 
   
   $form['filter']['col_country'] = array(
     '#type' => 'select',
@@ -218,7 +395,6 @@ function info_management_filter_form() {
 	  ),
 	);
   }
-  
 //  drupal_add_js(misc/form.js);
   return $form;
 } 
@@ -253,9 +429,17 @@ function info_management_filter_submit($form, &$form_state) {
 /**
  * Form builder: Builds the data management overview.
  */  
-function info_management_data() {  
-  $user_access =  1; // user_access('Access content for the Information Management module');
+function info_management_data() { 
   
+ // $col_checked = info_management_checked_column($columns); 
+  $data_table_column_name = array();
+  $data_table_column_name = info_management_check_table_column_name();
+  $data_table_column_checked = info_management_checked_column($data_table_column_name[0]);
+  $data_table_column_checked = drupal_map_assoc($data_table_column_checked);
+  
+//  drupal_set_message(t('Submitting values: @values', array('@values' => var_export($data_table_column_checked, TRUE))));
+ 
+  $user_access =  1; // user_access('Access content for the Information Management module');
   // Build the 'Update options' form.
   $form['options'] = array(
 	'#type' => 'fieldset',
@@ -284,16 +468,33 @@ function info_management_data() {
   );
 	
   // Build the sortable table header  
-  $header = array(
+  $header_full = array(
     'id' => array('data' => t('ID'), 'field' => 'n.id', 'sort' => 'desc'),  
 	'first_name' => array('data' => 'First Name', 'field' => 'n.first_name'),
 	'last_name' => array('data' => 'Last Name', 'field' => 'n.last_name'),
-	'email' => array('data' => t('Email'), 'field' => 'n.email'), 
+	'chinese_name' => array('data' => t('Chinese Name'), 'field' => 'n.chinese_name'),
+	'company' => array('data' => t('Company'), 'field' => 'n.website'),
+	'title' => array('data' => t('Title'), 'field' => 'n.title'),
+	'website' => array('data' => t('Website'), 'field' => 'n.website'),
+	'email' => array('data' => t('Email'), 'field' => 'n.email'),
+	'address' => array('data' => t('Address'), 'field' => 'n.address'),
+	'city' => array('data' => t('City'), 'field' => 'n.city'),
+	'province' => array('data' => t('Province'), 'field' => 'n.province'),
+	'postcode' => array('data' => t('Postcode'), 'field' => 'n.postcode'),
+	'mobile' => array('data' => t('Mobile'), 'field' => 'n.mobile'),
+	'tel_work' => array('data' => t('Tel at work'), 'field' => 'n.tel_work'),
+	'tel_home' => array('data' => t('Tel at home'), 'field' => 'n.tel_home'),  
+	'fax' => array('data' => t('Fax'), 'field' => 'n.fax'), 
 	'col_country' => array('data' => t('Country'), 'field' => 'n.col_country'), 
 	'col_industry' => array('data' => t('Industry'), 'field' => 'n.col_industry'),
 	'col_source' => array('data' => t('Source'), 'field' => 'n.col_source'),
+    'note' => array('data' => t('Note'), 'field' => 'n.note'),
 	'operation' =>  t('Operation'), 
   );
+  $header = array_intersect_key($header_full, $data_table_column_checked);
+//  drupal_set_message(t('Submitting values: @values', array('@values' => var_export($header_full, TRUE))));
+//  drupal_set_message(t('Submitting values: @values', array('@values' => var_export($data_table_column_checked, TRUE))));
+//  drupal_set_message(t('Submitting values: @values', array('@values' => var_export($header, TRUE))));
   
   // Use Database API to retrieve records.
   $max_num = variable_get('info_management_max', 3);
@@ -304,28 +505,43 @@ function info_management_data() {
   $query->leftJoin('info_management_source', 'sour', 'n.col_source = sour.s_id');  
 
   $results = $query
-     ->fields('n', array('id', 'first_name', 'last_name', 'email'))
-	 ->fields('coun', array('c_id', 'c_c_name', 'c_e_name'))
-	 ->fields('indu', array('i_id', 'i_c_name', 'i_e_name'))
-	 ->fields('sour', array('s_id', 's_c_name', 's_e_name'))
-     ->limit($max_num)
-	 ->orderByHeader($header)
-     ->addTag('info_management access')
-     ->execute();
+	->fields('n', array('id', 'first_name', 'last_name', 'chinese_name', 'company', 'title', 
+			'website', 'email', 'address', 'city', 'province', 'postcode', 'mobile', 'tel_work', 'tel_home',
+			'fax', 'note'))
+	->fields('coun', array('c_id', 'c_c_name', 'c_e_name'))
+	->fields('indu', array('i_id', 'i_c_name', 'i_e_name'))
+	->fields('sour', array('s_id', 's_c_name', 's_e_name'))
+	->limit($max_num)
+	->orderByHeader($header)
+	->addTag('info_management access')
+	->execute();
  
   // Prepare the list of records  
   // Iterate over the resultset and format them.
   $rows = array();
   foreach ($results as $row){
-//    $rows[$row->id] = array('id' => $row->id);
-    $rows[$row->id] = array('id' => array('data' => $row->id, 'class' => array('info-management-column-id')));
+    // $rows[$row->id] = array('id' => $row->id);
+	$rows[$row->id] = array('id' => array('data' => $row->id, 'class' => array('info-management-column-id')));
 	$rows[$row->id]['first_name'] = array('data' => $row->first_name, 'class' => array('info-management-column-first-name'));
 	$rows[$row->id]['last_name'] = array('data' => $row->last_name, 'class' => array('info-management-column-last-name'));
+	$rows[$row->id]['chinese_name'] = array('data' => $row->chinese_name, 'class' => array('info-management-column-chinese-name'));
+	$rows[$row->id]['company'] = array('data' => $row->company, 'class' => array('info-management-column-company')); 
+	$rows[$row->id]['title'] = array('data' => $row->title, 'class' => array('info-management-column-title')); 
+	$rows[$row->id]['website'] = array('data' => $row->website, 'class' => array('info-management-column-website'));
 	$rows[$row->id]['email'] = array('data' => $row->email, 'class' => array('info-management-column-email')); 
+	$rows[$row->id]['address'] = array('data' => $row->address, 'class' => array('info-management-column-address')); 
+	$rows[$row->id]['city'] = array('data' => $row->city, 'class' => array('info-management-column-city'));  
+	$rows[$row->id]['province'] = array('data' => $row->province, 'class' => array('info-management-column-province'));
+	$rows[$row->id]['postcode'] = array('data' => $row->postcode, 'class' => array('info-management-column-postcode'));  
+	$rows[$row->id]['mobile'] = array('data' => $row->mobile, 'class' => array('info-management-column-mobile')); 
+	$rows[$row->id]['tel_work'] = array('data' => $row->tel_work, 'class' => array('info-management-column-tel-work'));  
+	$rows[$row->id]['tel_home'] = array('data' => $row->tel_home, 'class' => array('info-management-column-tel_home'));
+	$rows[$row->id]['fax'] = array('data' => $row->fax, 'class' => array('info-management-column-fax'));  
+	$rows[$row->id]['note'] = array('data' => $row->note, 'class' => array('info-management-column-note'));
 	$rows[$row->id]['col_country'] = array('data' => $row->c_e_name . '/' . $row->c_c_name, 'class' => array('info-management-column-country')); 
 	$rows[$row->id]['col_industry'] = array('data' => $row->i_e_name . '/' . $row->i_c_name, 'class' => array('info-management-column-industry')); 
 	$rows[$row->id]['col_source'] = array('data' => $row->s_e_name . '/' . $row->s_c_name, 'class' => array('info-management-column-source')); 
-	// Build a list for all the accessible options for the current node
+    // Build a list for all the accessible options for the current node
 	$operations = array();
   	if ($user_access) {
 	  $operations['edit'] = array(
@@ -375,6 +591,8 @@ function info_management_data() {
 	'#options' => $rows,
 	'#empty' => t('There are no data formats found in the db.'),
  //	'#attributes' => array('class' => array('info-management-table')),
+    '#prefix' => '<div id="info-management-contacts-table">',
+	'#suffix' => '</div>',
   );
   // Attach the pager theme.
   $form['pager'] = array('#markup' => theme('pager'));   
@@ -385,29 +603,106 @@ function info_management_data() {
  * List data administration filters that can be applied.
  */
 function info_management_filters() {
-
   // Regular filters.
   $filters['id'] = array(
 	  '#type' => 'textfield',
 	  '#title' => t('ID'),
   );  
   $filters['first_name'] = array(
-	'#type' => 'textfield',
-	'#title' => t('First Name'),
+    '#type' => 'textfield',
+    '#title' => t('First Name in English'),
 	'#size' => 50,
-	'#maxlength' => 50,
+    '#maxlength' => 50,
   );
   $filters['last_name'] = array(
-	'#type' => 'textfield',
-	'#title' => t('Last Name'),
+    '#type' => 'textfield',
+    '#title' => t('Last Name in English'),
 	'#size' => 50,
-	'#maxlength' => 50,
+    '#maxlength' => 50,
+  );  
+  $filters['chinese_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Chinese Name'),
+	'#size' => 50,
+    '#maxlength' => 50,
   );
-  $filters['email'] = array(
-	'#type' => 'textfield',
-	'#title' => t('Email'),
+  $filters['company'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Company'),
 	'#size' => 100,
-	'#maxlength' => 100,
+    '#maxlength' => 200,
+  );
+  $filters['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+	'#size' => 100,
+    '#maxlength' => 200,
+  );
+  $filters['website'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Website'),
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
+  $filters['email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email'),
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
+  $filters['address'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Address'),
+	'#size' => 100,
+    '#maxlength' => 200,
+  ); 
+  
+  $filters['city'] = array(
+    '#type' => 'textfield',
+    '#title' => t('City'),
+	'#size' => 50,
+    '#maxlength' => 50,
+  ); 
+  $filters['province'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Province'),
+	'#size' => 50,
+    '#maxlength' => 100,
+  ); 
+  $filters['postcode'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Postcode'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );   
+  $filters['mobile'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Mobile'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $filters['tel_work'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Tel in office'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $filters['tel_home'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Tel at home'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $filters['fax'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Fax'),
+	'#size' => 20,
+    '#maxlength' => 20,
+  );  
+  $filters['note'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Note'),
+	'#cols' => 50,
   );  
   $filters['col_country'] = array(
 	'#type' => 'textfield',
@@ -437,15 +732,15 @@ function _record_build_filter_query(SelectQueryInterface $query) {
     if (trim($filter_value) != null) {
 	  switch ($filter_key) {
 		case 'col_country':
-		  if ($filter_value !='0') 
+		  if ($filter_value != '0') 
 		    $query->condition($filter_key, $filter_value, '=');
 		  break;
 		case 'col_industry':
-		  if ($filter_value !='0') 
+		  if ($filter_value != '0') 
 		    $query->condition($filter_key, $filter_value, '=');
 		  break;
 		case 'col_source':	
-		  if ($filter_value !='0') 
+		  if ($filter_value != '0') 
 		    $query->condition($filter_key, $filter_value, '=');	
 		  break;
 		default: 
@@ -645,9 +940,9 @@ function info_management_update_one_form($form, &$form_state, $arg0) {
 	
 	//Use Database API to retrieve records.
 	$query = db_select('info_management', 'n')
-	 ->fields('n', array('id', 'first_name', 'last_name', 'email', 'col_country', 'col_industry', 'col_source'))
-	 ->condition('id', $arg0, '=')
-	 ->orderBy('id', 'DESC'); //Most recent first.
+	  ->fields('n', array('id', 'first_name', 'last_name', 'email', 'col_country', 'col_industry', 'col_source'))
+	  ->condition('id', $arg0, '=')
+	  ->orderBy('id', 'DESC'); // Most recent first.
 		 
 	$result = $query->execute();  
   }
@@ -666,10 +961,6 @@ function info_management_update_one_form($form, &$form_state, $arg0) {
 	// This is the form elements.
 	$form['update'] = array(
 	  '#type' => 'fieldset',
-  //	  '#title' => t('Personal Information'),
-	   // Make the fieldset collapsible.
-  //	  '#collapsible' => TRUE,
-  //	  '#collapsed' => FALSE,
 	); 
 	$form['update']['id'] = array(
 	  '#type' => 'hidden',
@@ -745,12 +1036,24 @@ function info_management_update_one_form_submit($form, &$form_state) {
 	$id = $form_state['values']['id'];
 	$id_updated = db_update('info_management') // Table name no longer needs {}
 	 ->fields(array(
-	  'first_name' => $form_state['values']['first_name'],
-	  'last_name' => $form_state['values']['last_name'],
-	  'email' => $form_state['values']['email'],
-	  'col_country' => $form_state['values']['col_country'],
-	  'col_industry' => $form_state['values']['col_industry'],
-	  'col_source' => $form_state['values']['col_source'],
+	  'first_name' => check_plain($form_state['values']['first_name']),
+	  'last_name' => check_plain($form_state['values']['last_name']),
+	  'chinese_name' => check_plain($form_state['values']['chinese_name']),
+	  'company' => check_plain($form_state['values']['company']),
+	  'title' => check_plain($form_state['values']['title']),
+	  'website' => check_plain($form_state['values']['website']),
+	  'email' => check_plain($form_state['values']['email']),
+	  'address' => check_plain($form_state['values']['address']),
+	  'city' => check_plain($form_state['values']['city']),
+	  'province' => check_plain($form_state['values']['province']),
+	  'postcode' => check_plain($form_state['values']['postcode']),
+	  'tel_work' => check_plain($form_state['values']['tel_work']),
+	  'tel_home' => check_plain($form_state['values']['tel_home']),
+	  'fax' => check_plain($form_state['values']['fax']),
+	  'note' => check_plain($form_state['values']['note']),
+	  'col_country' => check_plain($form_state['values']['col_country']),
+	  'col_industry' => check_plain($form_state['values']['col_industry']),
+	  'col_source' => check_plain($form_state['values']['col_source']),
 	))
 	 ->condition('id', $id, '=')
 	 ->execute();
@@ -803,37 +1106,133 @@ function info_management_mass_update_form($form, &$form_state, $arg0) {
   foreach ($filters as $key => $value) {
     if($key != 'id') 
 	  $form['mass_update']['field_name']['#options'][$key]  = $value['#title'];
-  }	    	  
-  $form['mass_update']['old_value'] = array(
+  }	
+  $form['mass_update']['old_value_small'] = array(
     '#type' => 'textfield',
     '#title' => t('Old Value:'),
-	'#size' => 60,
-    '#maxlength' => 60,
+	'#size' => 20,
+    '#maxlength' => 20,
 	'#states' => array(
 	  'visible' => array(
 		':input[name="field_name"]' => array(
 		  array('value' => 'first_name'), 
 		  array('value' => 'last_name'), 
-		  array('value' => 'email'),
+		  array('value' => 'chinese_name'),
+		  array('value' => 'postcode'),
+		  array('value' => 'mobile'),
+		  array('value' => 'tel_work'),
+		  array('value' => 'tel_home'),
+		  array('value' => 'fax'),
 		),
 	  ),
 	), 
   );  
-  $form['mass_update']['new_value'] = array(
+  $form['mass_update']['new_value_small'] = array(
     '#type' => 'textfield',
     '#title' => t('New Value:'),
-	'#size' => 60,
-    '#maxlength' => 60,
+	'#size' => 20,
+    '#maxlength' => 20,
 	'#states' => array(
 	  'visible' => array(
 		':input[name="field_name"]' => array(
 		  array('value' => 'first_name'), 
 		  array('value' => 'last_name'), 
-		  array('value' => 'email'),
+		  array('value' => 'chinese_name'),
+		  array('value' => 'postcode'),
+		  array('value' => 'mobile'),
+		  array('value' => 'tel_work'),
+		  array('value' => 'tel_home'),
+		  array('value' => 'fax'),
+		),
+	  ),
+	), 
+  );    	  
+  $form['mass_update']['old_value_middle'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Old Value:'),
+	'#size' => 50,
+    '#maxlength' => 50,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array(
+		  array('value' => 'website'), 
+		  array('value' => 'email'), 
+		  array('value' => 'city'),
+		  array('value' => 'province'),
+		),
+	  ),
+	), 
+  );  
+  $form['mass_update']['new_value_middle'] = array(
+    '#type' => 'textfield',
+    '#title' => t('New Value:'),
+	'#size' => 50,
+    '#maxlength' => 50,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array(
+		  array('value' => 'website'), 
+		  array('value' => 'email'), 
+		  array('value' => 'city'),
+		  array('value' => 'province'),
 		),
 	  ),
 	), 
   );
+  $form['mass_update']['old_value_large'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Old Value:'),
+	'#size' => 100,
+    '#maxlength' => 200,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array(
+		  array('value' => 'company'), 
+		  array('value' => 'title'), 
+		  array('value' => 'address'),
+		),
+	  ),
+	), 
+  );  
+  $form['mass_update']['new_value_large'] = array(
+    '#type' => 'textfield',
+    '#title' => t('New Value:'),
+	'#size' => 100,
+    '#maxlength' => 200,
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array(
+		  array('value' => 'company'), 
+		  array('value' => 'title'), 
+		  array('value' => 'address'),
+		),
+	  ),
+	), 
+  );  
+  $form['mass_update']['old_value_note'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Old Value:'),
+	'#description' => t('No more than 1000 words please!'),
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array(
+		  array('value' => 'note'), 
+		),
+	  ),
+	), 
+  );
+  $form['mass_update']['new_value_note'] = array(
+    '#type' => 'textarea',
+    '#title' => t('New Value:'),
+    '#description' => t('No more than 1000 words please!'),
+	'#states' => array(
+	  'visible' => array(
+		':input[name="field_name"]' => array(
+		  array('value' => 'note'), 
+		),
+	  ),
+	), 
+  );   
   $form['mass_update']['old_country_value'] = array(
     '#type' => 'select',
     '#title' => t('Old Value:'),
@@ -868,7 +1267,7 @@ function info_management_mass_update_form($form, &$form_state, $arg0) {
   );  
   $form['mass_update']['new_industry_value'] = array(
     '#type' => 'select',
-    '#title' => t('New Value:'),
+    '#title' => t('new Value:'),
 	'#options' => $options_industry,
 	'#states' => array(
 	  'visible' => array(
@@ -905,7 +1304,7 @@ function info_management_mass_update_form($form, &$form_state, $arg0) {
     '#value' => t('Update'),
 	'#submit' => array('info_management_mass_update_form_submit'),
 	'#attributes' => array(
-		'class' => array('info-management-mass-update-submit'),
+	  'class' => array('info-management-mass-update-submit'),
 	),
   );   
   
@@ -922,22 +1321,43 @@ function info_management_mass_update_form_submit($form, &$form_state) {
   $session = isset($_SESSION['record_mass_update']) ? $_SESSION['record_mass_update'] : array();
   $field_name = $form_state['values']['field_name'];
   
-  switch ($field_name) {
+  if ($field_name == 'website' || $field_name == 'email' ||  $field_name == 'city' ||  $field_name == 'province') {
+    $field_name_sw =  'col_middle'; 
+  }   
+  else if ($field_name == 'company' || $field_name == 'title' ||  $field_name == 'address') {
+    $field_name_sw =  'col_large'; 
+  } 
+  else {
+    $field_name_sw = $field_name;
+  }
+  switch ($field_name_sw) {
+  	case 'col_middle':
+	  $new_value = trim(check_plain($form_state['values']['new_value_middle']));
+	  $old_value = trim(check_plain($form_state['values']['old_value_middle']));	
+	  break;
+	case 'col_large':
+	  $new_value = trim(check_plain($form_state['values']['new_value_large']));
+	  $old_value = trim(check_plain($form_state['values']['old_value_large']));	
+	  break;
+	case 'note':
+	  $new_value = trim(check_plain($form_state['values']['new_value_note']));
+	  $old_value = trim(check_plain($form_state['values']['old_value_note']));	
+	  break;
     case 'col_country': 
-	  $new_value = trim($form_state['values']['new_country_value']);
-	  $old_value = trim($form_state['values']['old_country_value']);	
+	  $new_value = trim(check_plain($form_state['values']['new_country_value']));
+	  $old_value = trim(check_plain($form_state['values']['old_country_value']));	
 	  break;
 	case 'col_industry':
-	  $new_value = trim($form_state['values']['new_industry_value']);
-	  $old_value = trim($form_state['values']['old_industry_value']);	
+	  $new_value = trim(check_plain($form_state['values']['new_industry_value']));
+	  $old_value = trim(check_plain($form_state['values']['old_industry_value']));	
 	  break;
 	case 'col_source':
-	  $new_value = trim($form_state['values']['new_source_value']);
-	  $old_value = trim($form_state['values']['old_source_value']);	
+	  $new_value = trim(check_plain($form_state['values']['new_source_value']));
+	  $old_value = trim(check_plain($form_state['values']['old_source_value']));	
 	  break;
 	default:
-	  $new_value = trim($form_state['values']['new_value']);
-	  $old_value = trim($form_state['values']['old_value']);	  
+	  $new_value = trim(check_plain($form_state['values']['new_value_small']));
+	  $old_value = trim(check_plain($form_state['values']['old_value_small']));	  
   }
   if (empty($session)) {
 	$query = db_select('info_management', 'n')
@@ -955,7 +1375,7 @@ function info_management_mass_update_form_submit($form, &$form_state) {
     
   // We use batch processing to prevent timeout when updating a large number
   // of data
-  if ($id_sum > 1) {
+  if ($id_sum > 5) {   
     $operations = array();
 	$operations[] = array('_data_mass_update_process', array($field_name, $new_value, $old_value, $id_array));
  	$batch = array(
@@ -973,7 +1393,7 @@ function info_management_mass_update_form_submit($form, &$form_state) {
 	);  	
 	batch_set($batch);
   }
-  else {
+  else {  
 	foreach ($id_array as $id) {
 	  _data_mass_update_helper($field_name, $new_value, $old_value, $id);
     }
@@ -992,7 +1412,7 @@ function _data_mass_update_process($field_name, $new_value, $old_value, $id_arra
     $context['sandbox']['id_array'] = $id_array;
   }
   // Process data by groups of 5.
-  $count = min(2, count($context['sandbox']['id_array']));
+  $count = min(5, count($context['sandbox']['id_array']));
   for ($i = 1; $i <= $count; $i++) {
     // For each id, reset the values
     $iid = array_shift($context['sandbox']['id_array']);
@@ -1004,7 +1424,7 @@ function _data_mass_update_process($field_name, $new_value, $old_value, $id_arra
 
     // Update our progress information.
     $context['sandbox']['progress']++;
-	// Optional message displayed under the progressbar.
+	// Optional message displayed under the progress bar.
     // $context['sandbox']['message'] = t('Loading "@iid"', array('@iid' => $iid));
   }  
   
@@ -1043,7 +1463,7 @@ function _data_mass_update_helper($field_name, $new_value, $old_value, $id) {
  */
 function _data_mass_update_batch_finished($success, $results, $operations) {
   if ($success) {
-    drupal_set_message(t('The update has been performed.')); 
+    drupal_set_message(t('The update has been performed!')); 
   }
   else {
     // An error occurred.
