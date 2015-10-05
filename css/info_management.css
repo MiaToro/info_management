@@ -182,5 +182,17 @@
   font-weight: normal;  
 }
 #edit-cancel { 
-  margin-left:20px;
+  margin-left: 20px;
+}
+#info-management-contacts-table { 
+  overflow: scroll; 
+  overflow-y: hidden; 
+  -ms-overflow-y: hidden;
+  white-space: nowrap;
+}
+#info-management-contacts-table th {
+  white-space: nowrap;
+}
+#edit-note {
+  width: 889px;
 }
