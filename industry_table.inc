@@ -220,14 +220,14 @@ function _record_delete_one($keys) {
     db_query('LOCK TABLES {info_management_industry} WRITE, {info_management} WRITE;');
     foreach ($keys as $id) { 
 	  $result = db_delete('info_management_industry')
-	    ->condition('c_id', $id, '=')
+	    ->condition('i_id', $id, '=')
 	    ->execute();
       $id_updated = db_update('info_management')  
         ->fields(array('col_industry' => '1'))
         ->condition('col_industry', $id, '=')
         ->execute();
     }
-	db_query('UNLOCK TABLES;');
+    db_query('UNLOCK TABLES;');
   }
   catch (Exception $e) {
     $transaction->rollback();

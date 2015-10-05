@@ -224,6 +224,16 @@ function info_management_menu() {
 	'file' => 'source_table.inc',
 	'weight' => 8,
   );
+  $items['info_management/data/process/check'] = array(
+    'title' => 'Fields Check',
+	'page callback' => 'drupal_get_form',
+	'page arguments' => array('info_management_check_update_form'),
+	'access callback' => TRUE,
+	'description' => 'The checked fields will be shown on the display page.',
+ 	'type' => MENU_LOCAL_TASK,
+	'file' => 'check_table.inc',
+	'weight' => 9,
+  );
   return $items;
 }
 
@@ -300,4 +310,56 @@ function info_management_form_alter(&$form, &$form_state, $form_id) {
  */
 function info_management_init() {
   drupal_add_css(drupal_get_path('module', 'info_management') . '/css/info_management.css');
+}
+
+/**
+ * Get the checked column data for the table 'ay_info_management'
+ */
+function info_management_checked_column($columns) {
+  try {
+	//Use Database API to retrieve records.
+	$query_values = db_select('info_management_field_check', 'n')
+ 	  ->fields('n', $columns);
+	$results = $query_values->execute();  
+  }
+  catch (Exception $e) {
+	// Log the exception to watchdog.
+	watchdog_exception('info_management_check_select', $e);
+  }
+ 
+  foreach ($results as $row) {  
+    foreach ($columns as $column_name) { 
+      $columns_value[$column_name] .= $row->$column_name;
+	}  
+  }
+  foreach ($columns_value as $key=>$value) {
+    if($value == '1') {
+	  $col_checked[] .= $key;
+	}
+  }
+  return $col_checked;
+}
+
+/**
+ * Get the 'ay_info_management' column name
+ *
+ * @return columns_assoc
+ *   The associated array of $columns
+ */
+function info_management_check_table_column_name() {
+  try {
+	//Use Database API to retrieve records.
+    $query_columns = db_query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = :tablename", array(':tablename' => 'ay_info_management'));  
+  }
+  catch (Exception $e) {
+	// Log the exception to watchdog.
+	watchdog_exception('table info_management columns', $e);
+  }
+  
+  foreach ($query_columns as $column){   
+    $columns[] .= $column->COLUMN_NAME;
+  }
+  $columns_assoc = drupal_map_assoc($columns);
+  
+  return array($columns, $columns_assoc); 
 }

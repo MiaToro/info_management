@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * @file
@@ -96,31 +96,92 @@ function info_management_schema() {
         'type' => 'varchar',
         'length' => 50,
 	  ),
+	  'chinese_name' => array(
+        'description' => t('Chinese name of the contact.'),
+        'type' => 'varchar',
+        'length' => 50,
+	  ),   
+	  'company' => array(
+        'description' => t('The company name.'),
+        'type' => 'varchar',
+		'length' => 200,
+	  ),	
+	  'title' => array(
+        'description' => t('The company name.'),
+        'type' => 'varchar',
+		'length' => 200,
+	  ),
+	  'website' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 50,
+	  ),		    
       'email' => array(
         'description' => t('The email of the contact.'),
         'type' => 'varchar',
-        'length' => 100,
+        'length' => 50,
 	  ),
+      'address' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 200,
+	  ),
+	  'city' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 50,
+	  ),
+	  'province' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 20,
+	  ),
+	  'postcode' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 20,
+	  ),
+	  'mobile' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 20,
+	  ),
+	  'tel_work' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 20,
+	  ),
+	  'tel_home' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 20,
+	  ),
+	  'fax' => array(
+        'description' => t('The email of the contact.'),
+        'type' => 'varchar',
+        'length' => 20,
+	  ),   
 	  'col_country' => array(
 		'description' => t('The id_id of the \'country\' table.'),
-		'type' => 'int', 
-		'size' => 'tiny',
-		'unsigned' => TRUE, 
+        'type' => 'varchar',
+        'length' => 20,
 		'default' => 1,   
 	  ),	
 	  'col_industry' => array(
 		'description' => t('The id_id of the \'industry\' table.'),
-		'type' => 'int', 
-		'size' => 'tiny',
-		'unsigned' => TRUE, 
+        'type' => 'varchar',
+        'length' => 20,
 		'default' => 1,
 	  ),   
 	  'col_source' => array(
 		'description' => t('The id_id of the \'info_source\' table.'),
-		'type' => 'int', 
-		'size' => 'tiny',
-		'unsigned' => TRUE, 
+        'type' => 'varchar',
+        'length' => 20,
 		'default' => 1,   
+	  ),
+	  'note' => array(
+        'description' => t('Additional information.'),
+        'type' => 'text',
 	  ),
 	),
 	'indexes' => array(
@@ -143,6 +204,132 @@ function info_management_schema() {
     'primary key' => array('id'),
   );
   
+  $schema['info_management_field_check'] = array(
+	// specification for 'info_management_field_check' table 
+	 'fields' => array(
+	  'id' => array(
+		'description' => t('The primary identifier for a record.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'first_name' => array(
+		'description' => t('The first name of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'last_name' => array(
+		'description' => t('The last name of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'chinese_name' => array(
+		'description' => t('Chinese name of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),   
+	  'company' => array(
+		'description' => t('The company name.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),	
+	  'title' => array(
+		'description' => t('The company name.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'website' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),		    
+	  'email' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'address' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'city' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'province' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'postcode' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'mobile' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'tel_work' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'tel_home' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'fax' => array(
+		'description' => t('The email of the contact.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),   
+	  'col_country' => array(
+		'description' => t('The id_id of the \'country\' table.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),	
+	  'col_industry' => array(
+		'description' => t('The id_id of the \'industry\' table.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),   
+	  'col_source' => array(
+		'description' => t('The id_id of the \'info_source\' table.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	  'note' => array(
+		'description' => t('Additional information.'),
+		'type' => 'char',
+		'length' => '1',
+		'default' => '1',
+	  ),
+	),
+  );   
+  
   return $schema;
 }
  
@@ -151,10 +338,86 @@ function info_management_schema() {
  */ 
 function info_management_install() {
   // Create tables.
-  drupal_install_schema('info_management');
-  drupal_install_schema('info_management_country');
-  drupal_install_schema('info_management_industry');
-  drupal_install_schema('info_management_source');
+//  drupal_install_schema('info_management');
+//  drupal_install_schema('info_management_country');
+//  drupal_install_schema('info_management_industry');
+//  drupal_install_schema('info_management_source');
+//  drupal_install_schema('info_management_field_check');
+  // Populate the default {info_management_country} record
+  $info_management_country = array(
+	array(
+	  'c_e_name' => 'TBD',
+	  'c_c_name' => '待定',
+	),
+  );  
+  $info_country_query = db_insert('info_management_country')
+	->fields(array('c_e_name', 'c_c_name'));
+  foreach ($info_management_country as $country) {
+	$info_country_query->values($country);
+  }
+  $info_country_query->execute();  
+   
+  $info_management_industry = array(
+	array(
+	  'i_e_name' => 'TBD',
+	  'i_c_name' => '待定',
+	),
+  );  
+  
+  $info_industry_query = db_insert('info_management_industry')
+	->fields(array('i_e_name', 'i_c_name'));
+  foreach ($info_management_industry as $industry) {
+	$info_industry_query->values($industry);
+  }
+  $info_industry_query->execute(); 
+   
+  $info_management_source = array(
+	array(
+	  's_e_name' => 'TBD',
+	  's_c_name' => '待定',
+	),
+  );  	
+  $info_source_query = db_insert('info_management_source')
+	->fields(array('s_e_name', 's_c_name'));
+  foreach ($info_management_source as $source) {
+	$info_source_query->values($source);
+  }
+  $info_source_query->execute();   
+   
+  // Populate the default {info_management_field_check} record
+  $info_management_check = array(
+	array(
+	  'id' => '1',
+	  'first_name' => '1',
+	  'last_name' => '1',
+	  'chinese_name' => '1',
+	  'company' => '1', 
+	  'title' => '1', 
+	  'website' => '1', 
+	  'email' => '1', 
+	  'address' => '1', 
+	  'city' => '1', 
+	  'province' => '1', 
+	  'postcode' => '1', 
+	  'mobile' => '1', 
+	  'tel_work' => '1',
+	  'tel_home' => '1', 
+	  'fax' => '1', 
+	  'col_country' => '1', 
+	  'col_industry' => '1', 
+	  'col_source' => '1', 
+	  'note' => '1', 
+	),
+  );
+  
+  $info_check_query = db_insert('info_management_field_check')
+	->fields(array('id', 'first_name', 'last_name', 'chinese_name', 'company', 'title', 'website', 
+      'email', 'address', 'city', 'province', 'postcode', 'mobile', 'tel_work', 'tel_home', 
+      'fax', 'col_country', 'col_industry', 'col_source', 'note'));
+  foreach ($info_management_check as $check) {
+	$info_check_query->values($check);
+  }
+  $info_check_query->execute();    
 }
 
 /**
@@ -166,4 +429,5 @@ function info_management_uninstall() {
   drupal_uninstall_schema('info_management_country');
   drupal_uninstall_schema('info_management_industry');
   drupal_uninstall_schema('info_management_source');
+  drupal_uninstall_schema('info_management_field_check');
 }

@@ -37,9 +37,8 @@ function info_management_country_input_form($form, &$form_state) {
     '#value' => t('Submit'),
 	'#attributes' => array(
 	   'class' => array('info-management-country-input-submit'),
-	  ),
+	),
   );
-
   return $form;
 }
 
@@ -179,7 +178,7 @@ function info_management_country_data() {
 	'#header' => $header,
 	'#options' => $rows,
 	'#empty' => t('There are no data formats found in the db.'),
- //	'#attributes' => array('class' => array('info-management-table')),
+  // '#attributes' => array('class' => array('info-management-table')),
   );
   // Attach the pager theme.
   $form['pager'] = array('#markup' => theme('pager'));

@@ -39,7 +39,6 @@ function info_management_source_input_form($form, &$form_state) {
 	   'class' => array('info-management-source-input-submit'),
 	  ),
   );
-
   return $form;
 }
 
